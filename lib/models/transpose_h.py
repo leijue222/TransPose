@@ -449,7 +449,7 @@ class TransPoseH(nn.Module):
         self.transition2 = self._make_transition_layer(
             pre_stage_channels, num_channels)
         self.stage3, pre_stage_channels = self._make_stage(
-            self.stage3_cfg, num_channels, multi_scale_output=False)
+            self.stage3_cfg, num_channels, multi_scale_output=True)
 
         d_model = cfg.MODEL.DIM_MODEL
         dim_feedforward = cfg.MODEL.DIM_FEEDFORWARD
@@ -458,14 +458,22 @@ class TransPoseH(nn.Module):
         pos_embedding_type = cfg.MODEL.POS_EMBEDDING
         w, h = cfg.MODEL.IMAGE_SIZE
 
-        self.reduce = nn.Conv2d(pre_stage_channels[0], d_model, 1, bias=False)
-        self._make_position_embedding(w, h, d_model, pos_embedding_type)
+        self.reduce = nn.Conv2d(pre_stage_channels[-1], d_model, 1, bias=False)
+        self._make_position_embedding(w//4, h//4, d_model, pos_embedding_type)
 
         encoder_layer = TransformerEncoderLayer(
             d_model=d_model, nhead=n_head, dim_feedforward=dim_feedforward,
             activation='relu')
         self.global_encoder = TransformerEncoder(
             encoder_layer, encoder_layers_num)
+
+        self.deconv_with_bias = extra.DECONV_WITH_BIAS
+
+        self.deconv_layers = self._make_deconv_layer(
+            extra.NUM_DECONV_LAYERS,   # 1
+            extra.NUM_DECONV_FILTERS,  # [d_model]
+            extra.NUM_DECONV_KERNELS,  # [4]
+        )
 
         self.final_layer = nn.Conv2d(
             in_channels=d_model,
@@ -615,14 +623,56 @@ class TransPoseH(nn.Module):
 
         return nn.Sequential(*modules), num_inchannels
 
-    def forward(self, x):
-        x = self.conv1(x)
+    def _get_deconv_cfg(self, deconv_kernel, index):
+        if deconv_kernel == 4:
+            padding = 1
+            output_padding = 0
+        elif deconv_kernel == 3:
+            padding = 1
+            output_padding = 1
+        elif deconv_kernel == 2:
+            padding = 0
+            output_padding = 0
+
+        return deconv_kernel, padding, output_padding
+
+    def _make_deconv_layer(self, num_layers, num_filters, num_kernels):
+        assert num_layers == len(num_filters), \
+            'ERROR: num_deconv_layers is different len(num_deconv_filters)'
+        assert num_layers == len(num_kernels), \
+            'ERROR: num_deconv_layers is different len(num_deconv_filters)'
+
+        layers = []
+        for i in range(num_layers):
+            kernel, padding, output_padding = \
+                self._get_deconv_cfg(num_kernels[i], i)
+
+            planes = num_filters[i]
+            layers.append(
+                nn.ConvTranspose2d(
+                    in_channels=planes,
+                    out_channels=planes,
+                    kernel_size=kernel,
+                    stride=2,
+                    padding=padding,
+                    output_padding=output_padding,
+                    bias=self.deconv_with_bias))
+            layers.append(nn.BatchNorm2d(planes, momentum=BN_MOMENTUM))
+            layers.append(nn.ReLU(inplace=True))
+            self.inplanes = planes
+            
+        return nn.Sequential(*layers)
+        
+
+    def deal_by_backbone(self, x):
+        # x [N, 3, 256, 192]
+        x = self.conv1(x)    # [N, 64, 128, 96]
         x = self.bn1(x)
-        x = self.relu(x)
-        x = self.conv2(x)
+        x = self.relu(x)    
+        x = self.conv2(x)    # [N, 64, 64, 48]
         x = self.bn2(x)
         x = self.relu(x)
-        x = self.layer1(x)
+        x = self.layer1(x)   # [N, 256, 64, 48]
 
         x_list = []
         for i in range(self.stage2_cfg['NUM_BRANCHES']):
@@ -638,13 +688,21 @@ class TransPoseH(nn.Module):
                 x_list.append(self.transition2[i](y_list[-1]))
             else:
                 x_list.append(y_list[i])
-        y_list = self.stage3(x_list)
+        y_list = self.stage3(x_list)  # [N, 48, 64, 48]
 
-        x = self.reduce(y_list[0])
+        # x = self.reduce(y_list[0]) # [N, 96, 64, 48]
+        x = self.reduce(y_list[-1])  # [N, 96, 16, 12]
+        
+        return x
+
+    def forward(self, x):
+        x = self.deal_by_backbone(x)
         bs, c, h, w = x.shape
         x = x.flatten(2).permute(2, 0, 1)
         x = self.global_encoder(x, pos=self.pos_embedding)
         x = x.permute(1, 2, 0).contiguous().view(bs, c, h, w)
+        x = self.deconv_layers(x)
+        x = self.deconv_layers(x)
         x = self.final_layer(x)
 
         return x
