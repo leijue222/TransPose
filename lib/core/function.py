@@ -25,8 +25,8 @@ from utils.vis import save_debug_images
 logger = logging.getLogger(__name__)
 
 
-def train(config, train_loader, model, criterion, optimizer, epoch,
-          output_dir, tb_log_dir, writer_dict):
+def train(config, train_loader, model, criterion, optimizer, epoch, global_rank,
+          output_dir=None, writer_dict=None):
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
@@ -72,7 +72,7 @@ def train(config, train_loader, model, criterion, optimizer, epoch,
         batch_time.update(time.time() - end)
         end = time.time()
 
-        if i % config.PRINT_FREQ == 0:
+        if i % config.PRINT_FREQ == 0 and global_rank == 0:
             msg = 'Epoch: [{0}][{1}/{2}]\t' \
                   'Time {batch_time.val:.3f}s ({batch_time.avg:.3f}s)\t' \
                   'Speed {speed:.1f} samples/s\t' \
@@ -95,8 +95,10 @@ def train(config, train_loader, model, criterion, optimizer, epoch,
             #                   prefix)
 
 
-def validate(config, val_loader, val_dataset, model, criterion, output_dir,
-             tb_log_dir, writer_dict=None):
+def validate(config, val_loader, val_dataset, model, criterion, output_dir, global_rank,
+             writer_dict=None):
+    if global_rank != 0:
+        return
     batch_time = AverageMeter()
     losses = AverageMeter()
     acc = AverageMeter()
