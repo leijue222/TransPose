@@ -457,9 +457,12 @@ class TransPoseH(nn.Module):
         n_head = cfg.MODEL.N_HEAD
         pos_embedding_type = cfg.MODEL.POS_EMBEDDING
         w, h = cfg.MODEL.IMAGE_SIZE
+        self.hrnet_outlayer = cfg.MODEL.HRNET_OUTLAYER
+        for _ in range(self.hrnet_outlayer):
+            w, h = w//2, h//2
 
-        self.reduce = nn.Conv2d(pre_stage_channels[-1], d_model, 1, bias=False)
-        self._make_position_embedding(w//4, h//4, d_model, pos_embedding_type)
+        self.reduce = nn.Conv2d(pre_stage_channels[self.hrnet_outlayer], d_model, 1, bias=False)
+        self._make_position_embedding(w, h, d_model, pos_embedding_type)
 
         encoder_layer = TransformerEncoderLayer(
             d_model=d_model, nhead=n_head, dim_feedforward=dim_feedforward,
@@ -690,8 +693,8 @@ class TransPoseH(nn.Module):
                 x_list.append(y_list[i])
         y_list = self.stage3(x_list)  # [N, 48, 64, 48]
 
-        # x = self.reduce(y_list[0]) # [N, 96, 64, 48]
-        x = self.reduce(y_list[-1])  # [N, 96, 16, 12]
+        x = self.reduce(y_list[self.hrnet_outlayer]) # [N, 96, 64, 48]
+        # x = self.reduce(y_list[-1])  # [N, 96, 16, 12]
         
         return x
 
@@ -701,8 +704,8 @@ class TransPoseH(nn.Module):
         x = x.flatten(2).permute(2, 0, 1)
         x = self.global_encoder(x, pos=self.pos_embedding)
         x = x.permute(1, 2, 0).contiguous().view(bs, c, h, w)
-        x = self.deconv_layers(x)
-        x = self.deconv_layers(x)
+        for _ in range(self.hrnet_outlayer):
+            x = self.deconv_layers(x)
         x = self.final_layer(x)
 
         return x
@@ -725,7 +728,7 @@ class TransPoseH(nn.Module):
                         nn.init.constant_(m.bias, 0)
 
         if os.path.isfile(pretrained):
-            pretrained_state_dict = torch.load(pretrained)
+            pretrained_state_dict = torch.load(pretrained, map_location='cpu')
             logger.info('=> loading pretrained model {}'.format(pretrained))
 
             existing_state_dict = {}
