@@ -205,9 +205,8 @@ def main():
 
         # evaluate on validation set
         perf_indicator = validate(
-            cfg, valid_loader, valid_dataset, model, criterion,
-            final_output_dir, tb_log_dir, writer_dict
-        )
+                cfg, valid_loader, valid_dataset, model, criterion,
+                final_output_dir, 0, writer_dict)
         
         lr_scheduler.step()
 

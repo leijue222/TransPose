@@ -72,9 +72,13 @@ def nms(dets, thresh):
     return keep
 
 
-def oks_iou(g, d, a_g, a_d, sigmas=None, in_vis_thre=None):
-    if not isinstance(sigmas, np.ndarray):
-        sigmas = np.array([.26, .25, .25, .35, .35, .79, .79, .72, .72, .62, .62, 1.07, 1.07, .87, .87, .89, .89]) / 10.0
+def oks_iou(g, d, a_g, a_d, sigmas=None, in_vis_thre=None, num_joints=17):
+    # 17为COCO，14为CrowdPose
+    if not isinstance(sigmas, np.ndarray): 
+        if num_joints == 17:
+            sigmas = np.array([.26, .25, .25, .35, .35, .79, .79, .72, .72, .62, .62, 1.07, 1.07, .87, .87, .89, .89]) / 10.0
+        elif num_joints == 14:
+            sigmas = np.array([.79, .79, .72, .72, .62, .62, 1.07, 1.07, .87, .87, .89, .89, .62, .79]) / 10.0
     vars = (sigmas * 2) ** 2
     xg = g[0::3]
     yg = g[1::3]
@@ -94,7 +98,7 @@ def oks_iou(g, d, a_g, a_d, sigmas=None, in_vis_thre=None):
     return ious
 
 
-def oks_nms(kpts_db, thresh, sigmas=None, in_vis_thre=None):
+def oks_nms(kpts_db, thresh, sigmas=None, in_vis_thre=None, num_joints=17):
     """
     greedily select boxes with high confidence and overlap with current maximum <= thresh
     rule out overlap >= thresh, overlap = oks
@@ -116,7 +120,7 @@ def oks_nms(kpts_db, thresh, sigmas=None, in_vis_thre=None):
         i = order[0]
         keep.append(i)
 
-        oks_ovr = oks_iou(kpts[i], kpts[order[1:]], areas[i], areas[order[1:]], sigmas, in_vis_thre)
+        oks_ovr = oks_iou(kpts[i], kpts[order[1:]], areas[i], areas[order[1:]], sigmas, in_vis_thre, num_joints)
 
         inds = np.where(oks_ovr <= thresh)[0]
         order = order[inds + 1]
@@ -135,7 +139,7 @@ def rescore(overlap, scores, thresh, type='gaussian'):
     return scores
 
 
-def soft_oks_nms(kpts_db, thresh, sigmas=None, in_vis_thre=None):
+def soft_oks_nms(kpts_db, thresh, sigmas=None, in_vis_thre=None, num_joints=17):
     """
     greedily select boxes with high confidence and overlap with current maximum <= thresh
     rule out overlap >= thresh, overlap = oks
@@ -160,7 +164,7 @@ def soft_oks_nms(kpts_db, thresh, sigmas=None, in_vis_thre=None):
     while order.size > 0 and keep_cnt < max_dets:
         i = order[0]
 
-        oks_ovr = oks_iou(kpts[i], kpts[order[1:]], areas[i], areas[order[1:]], sigmas, in_vis_thre)
+        oks_ovr = oks_iou(kpts[i], kpts[order[1:]], areas[i], areas[order[1:]], sigmas, in_vis_thre, num_joints)
 
         order = order[1:]
         scores = rescore(oks_ovr, scores[1:], thresh)
