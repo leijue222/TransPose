@@ -457,11 +457,10 @@ class TransPoseH(nn.Module):
         n_head = cfg.MODEL.N_HEAD
         pos_embedding_type = cfg.MODEL.POS_EMBEDDING
         w, h = cfg.MODEL.IMAGE_SIZE
-        self.hrnet_outlayer = cfg.MODEL.HRNET_OUTLAYER
-        for _ in range(self.hrnet_outlayer):
-            w, h = w//2, h//2
+        self.res_layer = cfg.MODEL.HRNET_RES_LAYER
+        w, h = w // 2**self.res_layer, h // 2**self.res_layer
 
-        self.reduce = nn.Conv2d(pre_stage_channels[self.hrnet_outlayer], d_model, 1, bias=False)
+        self.reduce = nn.Conv2d(pre_stage_channels[self.res_layer], d_model, 1, bias=False)
         self._make_position_embedding(w, h, d_model, pos_embedding_type)
 
         encoder_layer = TransformerEncoderLayer(
@@ -522,7 +521,8 @@ class TransPoseH(nn.Module):
         x_embed = x_embed / (x_embed[:, :, -1:] + eps) * scale
 
         dim_t = torch.arange(one_direction_feats, dtype=torch.float32)
-        dim_t = temperature ** (2 * (dim_t // 2) / one_direction_feats)
+        # dim_t = temperature ** (2 * (dim_t // 2) / one_direction_feats) # torch 1.7版本适用
+        dim_t = temperature ** (2 * torch.div(dim_t, 2, rounding_mode='floor') / one_direction_feats)
 
         pos_x = x_embed[:, :, :, None] / dim_t
         pos_y = y_embed[:, :, :, None] / dim_t
@@ -693,7 +693,7 @@ class TransPoseH(nn.Module):
                 x_list.append(y_list[i])
         y_list = self.stage3(x_list)  # [N, 48, 64, 48]
 
-        x = self.reduce(y_list[self.hrnet_outlayer]) # [N, 96, 64, 48]
+        x = self.reduce(y_list[self.res_layer]) # [N, 96, 64, 48]
         # x = self.reduce(y_list[-1])  # [N, 96, 16, 12]
         
         return x
@@ -704,7 +704,7 @@ class TransPoseH(nn.Module):
         x = x.flatten(2).permute(2, 0, 1)
         x = self.global_encoder(x, pos=self.pos_embedding)
         x = x.permute(1, 2, 0).contiguous().view(bs, c, h, w)
-        for _ in range(self.hrnet_outlayer):
+        for _ in range(self.res_layer):
             x = self.deconv_layers(x)
         x = self.final_layer(x)
 

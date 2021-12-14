@@ -26,7 +26,7 @@ from config import cfg
 from config import update_config
 from core.loss import JointsMSELoss
 from core.function import validate
-from utils.utils import create_logger, collate_fn
+from utils.utils import create_logger
 import dataset
 import models
 
@@ -157,12 +157,12 @@ def main():
         shuffle=False,
         num_workers=cfg.WORKERS,
         pin_memory=True,
-        collate_fn=collate_fn
     )
 
     # evaluate on validation set
+
     validate(cfg, valid_loader, valid_dataset, ddp_model, criterion,
-             final_output_dir, global_rank)
+                final_output_dir, 0)
 
 
 if __name__ == '__main__':

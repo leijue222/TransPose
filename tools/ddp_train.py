@@ -77,7 +77,7 @@ def parse_args():
                         help='prev Model directory',
                         type=str,
                         default='')
-    parser.add_argument("--local_rank", type=int, default=0)
+    # parser.add_argument("--local_rank", type=int, default=0)
     parser.add_argument("--seed", type=int, default=22)
     args = parser.parse_args()
 

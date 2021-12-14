@@ -71,8 +71,8 @@ def main():
     update_config(cfg, args)
 
     logger, final_output_dir, tb_log_dir = create_logger(
-        cfg, args.cfg, 'valid')
-
+        cfg, args.cfg, 0, 'valid')
+   
     logger.info(pprint.pformat(args))
     logger.info(cfg)
 
@@ -140,8 +140,8 @@ def main():
 
     # evaluate on validation set
     validate(cfg, valid_loader, valid_dataset, model, criterion,
-             final_output_dir, tb_log_dir)
-
+            final_output_dir, 0)
+  
 
 if __name__ == '__main__':
     main()

@@ -42,7 +42,7 @@ _C.MODEL.TAG_PER_JOINT = True
 _C.MODEL.TARGET_TYPE = 'gaussian'
 _C.MODEL.IMAGE_SIZE = [256, 256]  # width * height, ex: 192 * 256
 _C.MODEL.HEATMAP_SIZE = [64, 64]  # width * height, ex: 24 * 32
-_C.MODEL.HRNET_OUTLAYER = 0
+_C.MODEL.HRNET_RES_LAYER = 0
 _C.MODEL.SIGMA = 2
 _C.MODEL.EXTRA = CN(new_allowed=True)
 # Transformer
