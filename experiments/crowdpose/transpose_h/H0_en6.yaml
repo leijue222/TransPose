@@ -114,8 +114,8 @@ TEST:
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0
   IN_VIS_THRE: 0.2
-  # MODEL_FILE: models/pytorch/transpose_coco/tp_h_48_256x192_enc6_d96_h192_mh1.pth
-  MODEL_FILE: output/crowdpose/transpose_h/H0_en6/model_best.pth
+  MODEL_FILE: models/pytorch/transpose_crowdpose/H0_en6_transpose.pth
+  # MODEL_FILE: output/crowdpose/transpose_h/H0_en6/model_best.pth
   NMS_THRE: 1.0
   OKS_THRE: 0.9
   USE_GT_BBOX: true
