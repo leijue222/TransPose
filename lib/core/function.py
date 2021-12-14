@@ -20,6 +20,7 @@ from core.evaluate import accuracy
 from core.inference import get_final_preds
 from utils.transforms import flip_back
 from utils.vis import save_debug_images
+from pylsy import pylsytable
 
 
 logger = logging.getLogger(__name__)
@@ -239,23 +240,13 @@ def validate(config, val_loader, val_dataset, model, criterion, output_dir, glob
 
 # markdown format output
 def _print_name_value(name_value, full_arch_name):
-    names = name_value.keys()
-    values = name_value.values()
-    num_values = len(name_value)
-    logger.info(
-        '| Arch ' +
-        ' '.join(['| {}'.format(name) for name in names]) +
-        ' |'
-    )
-    logger.info('|---' * (num_values+1) + '|')
-
-    if len(full_arch_name) > 15:
-        full_arch_name = full_arch_name[:8] + '...'
-    logger.info(
-        '| ' + full_arch_name + ' ' +
-        ' '.join(['| {:.3f}'.format(value) for value in values]) +
-         ' |'
-    )
+    names = list(name_value.keys())
+    values = list(name_value.values())
+    table = pylsytable(names)
+    logger.info('\nArch: ' + full_arch_name)
+    for name, value in zip(names, values):
+        table.add_data(str(name), round(value, 2))
+    logger.info(table)
 
 
 class AverageMeter(object):

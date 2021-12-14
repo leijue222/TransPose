@@ -448,10 +448,12 @@ class CROWDPOSEDataset(JointsDataset):
         cocoEval.accumulate()
         cocoEval.summarize()
 
-        stats_names = ['AP', 'Ap .5', 'AP .75', 'AP (M)', 'AP (L)', 'AR', 'AR .5', 'AR .75', 'AR (M)', 'AR (L)']
+        stats_val = cocoEval.stats.tolist()
+        stats_val = stats_val[0:3] + stats_val[5:]
+        stats_names = ['AP', 'Ap .5', 'AP .75', 'AR', 'AR .5', 'AR .75', 'AP (easy)', 'AP (medium)', 'AP (hard)']
 
         info_str = []
-        for ind, name in enumerate(stats_names):
-            info_str.append((name, cocoEval.stats[ind]))
+        for name, val in zip(stats_names, stats_val):
+            info_str.append((name, val))
 
         return info_str
