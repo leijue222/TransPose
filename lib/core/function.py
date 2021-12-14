@@ -245,7 +245,7 @@ def _print_name_value(name_value, full_arch_name):
     table = pylsytable(names)
     logger.info('\nArch: ' + full_arch_name)
     for name, value in zip(names, values):
-        table.add_data(str(name), round(value, 2))
+        table.add_data(str(name), round(value, 3))
     logger.info(table)
 
 
