@@ -7,7 +7,6 @@ DATA_DIR: ''
 GPUS: (0,)
 OUTPUT_DIR: 'output'
 LOG_DIR: 'log'
-# WORKERS: 8
 WORKERS: 0
 PRINT_FREQ: 100
 
@@ -19,7 +18,6 @@ DATASET:
   NUM_JOINTS_HALF_BODY: 8
   PROB_HALF_BODY: 0.3 
   ROOT: '/media/ming-t/F83438063437C702/datasets/coco/'
-  # ROOT: '../MutiTransPose/data/coco'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: 'val2017'
@@ -37,7 +35,7 @@ MODEL:
   INIT_WEIGHTS: true
   NAME: transpose_h
   NUM_JOINTS: 17
-  PRETRAINED: '../MutiTransPose/models/pytorch/imagenet/hrnet_w48-8ef0771d.pth'
+  PRETRAINED: 'models/pytorch/imagenet/hrnet_w48-8ef0771d.pth'
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
   - 192
@@ -91,7 +89,7 @@ MODEL:
 LOSS:
   USE_TARGET_WEIGHT: true
 TRAIN:
-  BATCH_SIZE_PER_GPU: 24
+  BATCH_SIZE_PER_GPU: 14
   SHUFFLE: true
   BEGIN_EPOCH: 0
   END_EPOCH: 240
@@ -114,12 +112,10 @@ TEST:
   # 'data/coco/person_detection_results/COCO_test-dev2017_detections_AP_H_609_person.json'
   # 'data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json'
   COCO_BBOX_FILE: '/media/ming-t/F83438063437C702/datasets/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json'
-  # COCO_BBOX_FILE: '../MutiTransPose/data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json'
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0
   IN_VIS_THRE: 0.2
-  MODEL_FILE: models/pytorch/transpose_coco/H0_en6_transpose.pth
-  # MODEL_FILE: output/coco/transpose_h/TP_H_w48_256x192_stage3_1_4_d96_h192_relu_enc6_mh1/model_best.pth
+  MODEL_FILE: models/pytorch/transpose_coco/tp_h_48_256x192_enc6_d96_h192_mh1.pth
   NMS_THRE: 1.0
   OKS_THRE: 0.9
   USE_GT_BBOX: true
