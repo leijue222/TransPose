@@ -90,7 +90,7 @@ def main():
         ckpt_state_dict = torch.load(cfg.TEST.MODEL_FILE)
         # print(ckpt_state_dict['pos_embedding'])  # FOR UNSeen Resolutions
         # ckpt_state_dict.pop('pos_embedding') # FOR UNSeen Resolutions
-        model.load_state_dict(ckpt_state_dict, strict=True)   #  strict=False FOR UNSeen Resolutions
+        model.load_state_dict(ckpt_state_dict, strict=False)   #  strict=False FOR UNSeen Resolutions
     else:
         model_state_file = os.path.join(
             final_output_dir, 'final_state.pth'

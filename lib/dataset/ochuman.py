@@ -18,6 +18,7 @@ from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 import json_tricks as json
 import numpy as np
+import random
 
 from dataset.JointsDataset import JointsDataset
 from nms.nms import oks_nms
@@ -27,7 +28,7 @@ from nms.nms import soft_oks_nms
 logger = logging.getLogger(__name__)
 
 
-class COCODataset(JointsDataset):
+class OCHumanDataset(JointsDataset):
     '''
     "keypoints": {
         0: "nose",
@@ -66,7 +67,7 @@ class COCODataset(JointsDataset):
         self.aspect_ratio = self.image_width * 1.0 / self.image_height
         self.pixel_std = 200
 
-        self.coco = COCO(self._get_ann_file_keypoint())
+        self.coco = COCO(os.path.join(self.root,self.image_set))
 
         # deal with class names
         cats = [cat['name']
@@ -145,8 +146,9 @@ class COCODataset(JointsDataset):
         """
         coco ann: [u'segmentation', u'area', u'iscrowd', u'image_id', u'bbox', u'category_id', u'id']
         iscrowd:
-            crowd instances are handled by marking their overlaps with all categories to -1
-            and later excluded in training
+            crowd instances are handled by markiimage': self.image_path_from_index(index),
+            'filename': '',
+            # 'annos': rec
         bbox:
             [x1, y1, w, h]
         :param index: coco image id
@@ -173,6 +175,7 @@ class COCODataset(JointsDataset):
         objs = valid_objs
 
         rec = []
+        idx = 1
         for obj in objs:
             cls = self._coco_ind_to_class_ind[obj['category_id']]
             if cls != 1:
@@ -182,8 +185,8 @@ class COCODataset(JointsDataset):
             if max(obj['keypoints']) == 0:
                 continue
 
-            joints_3d = np.zeros((self.num_joints, 3), dtype=np.float)
-            joints_3d_vis = np.zeros((self.num_joints, 3), dtype=np.float)
+            joints_3d = np.zeros((self.num_joints, 3), dtype=np.float32)
+            joints_3d_vis = np.zeros((self.num_joints, 3), dtype=np.float32)
             for ipt in range(self.num_joints):
                 joints_3d[ipt, 0] = obj['keypoints'][ipt * 3 + 0]
                 joints_3d[ipt, 1] = obj['keypoints'][ipt * 3 + 1]
@@ -197,17 +200,24 @@ class COCODataset(JointsDataset):
 
             center, scale = self._box2cs(obj['clean_bbox'][:4])
             rec.append({
-                'image': self.image_path_from_index(index),
+                'image':self.image_path_from_index(index),
+                'box': obj['clean_bbox'],
                 'center': center,
                 'scale': scale,
                 'joints_3d': joints_3d,
                 'joints_3d_vis': joints_3d_vis,
-                'filename': '',
-                'imgnum': 0,
-                'bbox': obj['clean_bbox'][:4]
+                'imgnum': idx,
             })
+            idx += 1
+        # res = [{
+        #     'image': self.image_path_from_index(index),
+        #     'filename': '',
+        #     'annos': rec
+        # }]
 
+        # return rec if rec == [] else res
         return rec
+
 
     def _box2cs(self, box):
         x, y, w, h = box[:4]
@@ -230,18 +240,21 @@ class COCODataset(JointsDataset):
 
         return center, scale
 
+    def _cs2xywh(self, center, scale):
+        if center[0] != -1:
+            scale = scale / 1.25
+        scale = scale * self.pixel_std
+        w, h = scale[0], scale[1]
+        x = center[0] - (w - 1) * 0.5
+        y = center[1] - (h - 1) * 0.5
+        return [x, y, w,h]
+
+
     def image_path_from_index(self, index):
         """ example: images / train2017 / 000000119993.jpg """
-        file_name = '%012d.jpg' % index
-        if '2014' in self.image_set:
-            file_name = 'COCO_%s_' % self.image_set + file_name
-
-        prefix = 'test2017' if 'test' in self.image_set else self.image_set
-
-        data_name = prefix + '.zip@' if self.data_format == 'zip' else prefix
-
+        file_name = '%06d.jpg' % index
         image_path = os.path.join(
-            self.root, 'images', data_name, file_name)
+            self.root, 'images', file_name)
 
         return image_path
 
@@ -277,13 +290,17 @@ class COCODataset(JointsDataset):
                 (self.num_joints, 3), dtype=np.float)
             kpt_db.append({
                 'image': img_name,
-                'center': center,
-                'scale': scale,
-                'score': score,
-                'joints_3d': joints_3d,
-                'joints_3d_vis': joints_3d_vis,
+                'filename': '',
+                'annos': [{
+                    'box': det_res['bbox'],
+                    'center': center,
+                    'scale': scale,
+                    'score': score,
+                    'joints_3d': joints_3d,
+                    'joints_3d_vis': joints_3d_vis,
+                    'imgnum': 0,
+                }]
             })
-
         logger.info('=> Total boxes after fliter low score@{}: {}'.format(
             self.image_thre, num_boxes))
         return kpt_db
@@ -313,7 +330,7 @@ class COCODataset(JointsDataset):
                 'scale': all_boxes[idx][2:4],
                 'area': all_boxes[idx][4],
                 'score': all_boxes[idx][5],
-                'image': int(img_path[idx][-16:-4])
+                'image': int(img_path[idx][-10:-4])
             })
         # image x person x (keypoints)
         kpts = defaultdict(list)
@@ -359,13 +376,13 @@ class COCODataset(JointsDataset):
 
         self._write_coco_keypoint_results(
             oks_nmsed_kpts, res_file)
-        if 'test' not in self.image_set:
-            info_str = self._do_python_keypoint_eval(
-                res_file, res_folder)
-            name_value = OrderedDict(info_str)
-            return name_value, name_value['AP']
-        else:
-            return {'Null': 0}, 0
+        # if 'test' not in self.image_set:
+        info_str = self._do_python_keypoint_eval(
+            res_file, res_folder)
+        name_value = OrderedDict(info_str)
+        return name_value, name_value['AP']
+        # else:
+        #     return {'Null': 0}, 0
 
     def _write_coco_keypoint_results(self, keypoints, res_file):
         data_pack = [

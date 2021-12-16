@@ -112,6 +112,7 @@ class JointsDataset(Dataset):
         return len(self.db)
 
     def __getitem__(self, idx):
+        # idx=4
         db_rec = copy.deepcopy(self.db[idx])
 
         image_file = db_rec['image']
@@ -134,6 +135,9 @@ class JointsDataset(Dataset):
         if data_numpy is None:
             logger.error('=> fail to read {}'.format(image_file))
             raise ValueError('Fail to read {}'.format(image_file))
+
+        image_list = [data_numpy]
+        image_title = ['ori']
 
         joints = db_rec['joints_3d']
         joints_vis = db_rec['joints_3d_vis']
@@ -165,6 +169,9 @@ class JointsDataset(Dataset):
                     joints, joints_vis, data_numpy.shape[1], self.flip_pairs)
                 c[0] = data_numpy.shape[1] - c[0] - 1
                 
+                image_list.append(data_numpy)
+                image_title.append('flip')
+                
         joints_heatmap = joints.copy()
         trans = get_affine_transform(c, s, r, self.image_size)
         trans_heatmap = get_affine_transform(c, s, r, self.heatmap_size)
@@ -175,6 +182,9 @@ class JointsDataset(Dataset):
             (int(self.image_size[0]), int(self.image_size[1])),
             flags=cv2.INTER_LINEAR)
 
+        image_list.append(input)
+        image_title.append('input ' + str(imgnum))
+        
         if self.transform:
             input = self.transform(input)
 
@@ -200,6 +210,8 @@ class JointsDataset(Dataset):
             'score': score
         }
 
+        # self.show_images(image_list, image_title, bbox=db_rec['bbox'])
+        # exit(1)
         return input, target, target_weight, meta
 
     def select_data(self, db):
@@ -293,3 +305,63 @@ class JointsDataset(Dataset):
             target_weight = 0
 
         return target_weight
+
+
+    def show_images(self, image_list, titles=None, num_cols=None, scale=3, normalize=False, bbox=None):
+        import matplotlib.pyplot as plt
+        """ 一个窗口中绘制多张图像:
+        Args: 
+            images: 可以为一张图像(不要放在列表中)，也可以为一个图像列表
+            titles: 图像对应标题、
+            num_cols: 每行最多显示多少张图像
+            scale: 用于调整图窗大小
+            normalize: 显示灰度图时是否进行灰度归一化
+        """
+        # 加了下面2行后可以显示中文标题
+        plt.rcParams['font.sans-serif'] = ['SimHei']
+        plt.rcParams['axes.unicode_minus'] = False
+        # 多张图片显示
+        if not isinstance(scale, tuple):
+            scale = (scale, scale)
+
+        num_imgs = len(image_list)
+        if num_cols is None:
+            num_cols = int(np.ceil((np.sqrt(num_imgs))))
+        num_rows = (num_imgs - 1) // num_cols + 1
+
+        idx = list(range(num_imgs))
+        _, figs = plt.subplots(num_rows, num_cols,
+                            figsize=(scale[1] * num_cols, scale[0] * num_rows))
+        for f, i, img in zip(figs.flat, idx, image_list):
+            if len(img.shape) == 3:
+                # opencv库中函数生成的图像为BGR通道，需要转换一下
+                # B, G, R = cv2.split(img)
+                # img = cv2.merge([R, G, B])
+                f.imshow(img)
+            elif len(img.shape) == 2:
+                # pyplot显示灰度需要加一个参数
+                if normalize:
+                    f.imshow(img, cmap='gray')
+                else:
+                    f.imshow(img, cmap='gray', vmin=0, vmax=255)
+            else:
+                raise TypeError("Invalid shape " +
+                                str(img.shape) + " of image data")
+            if titles is not None:
+                f.set_title(titles[i], y=-0.15)
+            f.axes.get_xaxis().set_visible(True)
+            f.axes.get_yaxis().set_visible(True)
+            if i==0:
+                print(bbox)
+                f.add_patch(plt.Rectangle(xy=(bbox[0],bbox[1]),
+                                                  width=bbox[2],
+                                                  height=bbox[3],
+                                                  linewidth=2,
+                                                  edgecolor='red'))
+        # 将不显示图像的fig移除，不然会显示多余的窗口
+        if len(figs.shape) == 1:
+            figs = figs.reshape(-1, figs.shape[0])
+        for i in range(num_rows * num_cols - num_imgs):
+            figs[num_rows - 1, num_imgs % num_cols + i].remove()
+        # plt.show()
+        plt.savefig('debug_ochuman.jpg')
