@@ -1,11 +1,14 @@
-复现TransPose方法在不同分辨率下的结果
+# 复现TransPose方法在不同分辨率下的结果
 
-cd lib
-make
-cd ..
+# cd lib
+# make
+# cd ..
 
-python -m torch.distributed.launch --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_enc6.yaml
-python -m torch.distributed.launch --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H2_enc6.yaml
+# python -m torch.distributed.launch --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_enc6.yaml
+# python -m torch.distributed.launch --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H2_enc6.yaml
 
 
-torchrun --nproc_per_node=2 tools/ddp_train.py --cfg experiments/crowdpose/transpose_h/H0_en6.yaml
+# torchrun --nproc_per_node=2 tools/ddp_train.py --cfg experiments/crowdpose/transpose_h/H0_en6.yaml
+
+# 需要补充做这个实验
+torchrun --nproc_per_node=2 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en6_cocomini.yaml
