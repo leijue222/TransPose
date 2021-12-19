@@ -17,8 +17,8 @@ DATASET:
   FLIP: true
   NUM_JOINTS_HALF_BODY: 8
   PROB_HALF_BODY: 0.3 
-  ROOT: '/media/ming-t/F83438063437C702/datasets/coco/'
-  # ROOT: '../MutiTransPose/data/coco'
+  # ROOT: '/media/ming-t/F83438063437C702/datasets/coco/'
+  ROOT: '../MutiTransPose/data/coco'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: 'val2017'
