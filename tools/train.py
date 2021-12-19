@@ -40,6 +40,8 @@ from utils.utils import get_model_summary
 import dataset
 import models
 
+# os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+
 def parse_args():
     parser = argparse.ArgumentParser(description='Train keypoints network')
     # general

@@ -119,8 +119,8 @@ class COCODataset(JointsDataset):
         #     'annotations',
         #     prefix + '_' + self.image_set + '.json'
         # )
-        return '/media/yiwei/yiwei-01/datasets/pose/OCHuman/ochuman_coco_format_test_range_0.00_1.00.json'
-        # return '/media/yiwei/yiwei-01/datasets/pose/OCHuman/ochuman_coco_format_val_range_0.00_1.00.json'
+        # return '/media/ming-t/F83438063437C702/datasets/OCHuman/ochuman_coco_format_test_range_0.00_1.00.json'
+        return '/media/ming-t/F83438063437C702/datasets/OCHuman/ochuman_coco_format_val_range_0.00_1.00.json'
 
     def _load_image_set_index(self):
         """ image id: int """
@@ -206,15 +206,10 @@ class COCODataset(JointsDataset):
                 'joints_3d_vis': joints_3d_vis,
                 'filename': '',
                 'imgnum': 0,
-                'box': obj['clean_bbox'][:4]
+                'bbox': obj['clean_bbox'][:4]
             })
-        res = [{
-            'image': self.image_path_from_index(index),
-            'filename': '',
-            'annos': rec
-        }]
+
         return rec
-        # return rec if rec == [] else res
 
     def _box2cs(self, box):
         x, y, w, h = box[:4]
@@ -250,7 +245,7 @@ class COCODataset(JointsDataset):
         # image_path = os.path.join(
         #     self.root, 'images', data_name, file_name)
         file_name = '%06d.jpg' % index
-        image_path = os.path.join('/media/yiwei/yiwei-01/datasets/pose/OCHuman/images', file_name)
+        image_path = os.path.join('/media/ming-t/F83438063437C702/datasets/OCHuman/images', file_name)
         return image_path
 
     def _load_coco_person_detection_results(self):

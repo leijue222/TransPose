@@ -138,7 +138,14 @@ class COCODataset(JointsDataset):
         """ ground truth bbox and keypoints """
         gt_db = []
         for index in self.image_set_index:
-            gt_db.extend(self._load_coco_keypoint_annotation_kernal(index))
+            res = self._load_coco_keypoint_annotation_kernal(index)
+            # gt_db.extend(res)
+            if res != []:
+                if self.image_set == 'train2017':
+                    if len(res) > 1:
+                        gt_db.extend(res)
+                elif self.image_set == 'val2017':
+                    gt_db.extend(res)
         return gt_db
 
     def _load_coco_keypoint_annotation_kernal(self, index):
