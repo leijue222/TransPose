@@ -111,14 +111,16 @@ class COCODataset(JointsDataset):
         logger.info('=> load {} samples'.format(len(self.db)))
 
     def _get_ann_file_keypoint(self):
-        """ self.root / annotations / person_keypoints_train2017.json """
-        prefix = 'person_keypoints' \
-            if 'test' not in self.image_set else 'image_info'
-        return os.path.join(
-            self.root,
-            'annotations',
-            prefix + '_' + self.image_set + '.json'
-        )
+        # """ self.root / annotations / person_keypoints_train2017.json """
+        # prefix = 'person_keypoints' \
+        #     if 'test' not in self.image_set else 'image_info'
+        # return os.path.join(
+        #     self.root,
+        #     'annotations',
+        #     prefix + '_' + self.image_set + '.json'
+        # )
+        # return '/media/ming-t/F83438063437C702/datasets/OCHuman/ochuman_coco_format_test_range_0.00_1.00.json'
+        return '/media/ming-t/F83438063437C702/datasets/OCHuman/ochuman_coco_format_val_range_0.00_1.00.json'
 
     def _load_image_set_index(self):
         """ image id: int """
@@ -138,14 +140,7 @@ class COCODataset(JointsDataset):
         """ ground truth bbox and keypoints """
         gt_db = []
         for index in self.image_set_index:
-            res = self._load_coco_keypoint_annotation_kernal(index)
-            # gt_db.extend(res)
-            if res != []:
-                if self.image_set == 'train2017':
-                    if len(res) > 1:
-                        gt_db.extend(res)
-                elif self.image_set == 'val2017':
-                    gt_db.extend(res)
+            gt_db.extend(self._load_coco_keypoint_annotation_kernal(index))
         return gt_db
 
     def _load_coco_keypoint_annotation_kernal(self, index):
@@ -239,17 +234,18 @@ class COCODataset(JointsDataset):
 
     def image_path_from_index(self, index):
         """ example: images / train2017 / 000000119993.jpg """
-        file_name = '%012d.jpg' % index
-        if '2014' in self.image_set:
-            file_name = 'COCO_%s_' % self.image_set + file_name
+        # file_name = '%012d.jpg' % index
+        # if '2014' in self.image_set:
+        #     file_name = 'COCO_%s_' % self.image_set + file_name
 
-        prefix = 'test2017' if 'test' in self.image_set else self.image_set
+        # prefix = 'test2017' if 'test' in self.image_set else self.image_set
 
-        data_name = prefix + '.zip@' if self.data_format == 'zip' else prefix
+        # data_name = prefix + '.zip@' if self.data_format == 'zip' else prefix
 
-        image_path = os.path.join(
-            self.root, 'images', data_name, file_name)
-
+        # image_path = os.path.join(
+        #     self.root, 'images', data_name, file_name)
+        file_name = '%06d.jpg' % index
+        image_path = os.path.join('/media/ming-t/F83438063437C702/datasets/OCHuman/images', file_name)
         return image_path
 
     def _load_coco_person_detection_results(self):
@@ -320,7 +316,8 @@ class COCODataset(JointsDataset):
                 'scale': all_boxes[idx][2:4],
                 'area': all_boxes[idx][4],
                 'score': all_boxes[idx][5],
-                'image': int(img_path[idx][-16:-4])
+                # 'image': int(img_path[idx][-16:-4])
+                'image': int(img_path[idx][-10:-4])
             })
         # image x person x (keypoints)
         kpts = defaultdict(list)
