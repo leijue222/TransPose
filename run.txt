@@ -6,9 +6,13 @@
 
 # torchrun --nproc_per_node=2 tools/ddp_train.py --cfg experiments/crowdpose/transpose_h/H0_en6.yaml
 
-# 需要补充做这个实验
-torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en6_cocomini.yaml
-torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en3_cocomini.yaml
-torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en4_cocomini.yaml
-torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en4_head8_cocomini.yaml
+# 用TransPose在CoCoMini数据集上训练encorder不同层数的情况
+# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en6_cocomini.yaml
+# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en3_cocomini.yaml
+# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en4_cocomini.yaml
+# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en4_head8_cocomini.yaml
 
+# 用TransPose在CrowdPose数据集上训练encorder层数为3和4的情况
+
+torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/transpose_h/H0_en3.yaml
+torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/transpose_h/H0_en4.yaml
