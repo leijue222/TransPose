@@ -17,8 +17,8 @@ DATASET:
   FLIP: true
   NUM_JOINTS_HALF_BODY: 8
   PROB_HALF_BODY: 0.3 
-  # ROOT: '/media/ming-t/F83438063437C702/datasets/coco/'
-  ROOT: '../MutiTransPose/data/coco'
+  ROOT: '/media/ming-t/F83438063437C702/datasets/coco/'
+  # ROOT: '../MutiTransPose/data/coco'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: 'val2017'
@@ -113,13 +113,13 @@ TEST:
   BATCH_SIZE_PER_GPU: 128
   # 'data/coco/person_detection_results/COCO_test-dev2017_detections_AP_H_609_person.json'
   # 'data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json'
-  # COCO_BBOX_FILE: '/media/ming-t/F83438063437C702/datasets/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json'
-  COCO_BBOX_FILE: '../MutiTransPose/data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json'
+  COCO_BBOX_FILE: '/media/ming-t/F83438063437C702/datasets/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json'
+  # COCO_BBOX_FILE: '../MutiTransPose/data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json'
   # COCO_BBOX_FILE: '/media/ming-t/F83438063437C702/datasets/OCHuman/ochuman_coco_format_val_range_0.00_1.00.json'
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0
   IN_VIS_THRE: 0.2
-  MODEL_FILE: models/pytorch/transpose_coco/H0_en6_transpose.pth
+  MODEL_FILE: models/pytorch/transpose_cocomini/transpose_en3_cocomini.pth
   # MODEL_FILE: output/coco/transpose_h/TP_H_w48_256x192_stage3_1_4_d96_h192_relu_enc6_mh1/model_best.pth
   NMS_THRE: 1.0
   OKS_THRE: 0.9

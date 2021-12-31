@@ -114,10 +114,6 @@ def main():
         'valid_global_steps': 0,
     }
 
-    dump_input = torch.rand(
-        (1, 3, cfg.MODEL.IMAGE_SIZE[1], cfg.MODEL.IMAGE_SIZE[0])
-    )
-
     model = torch.nn.DataParallel(model, device_ids=cfg.GPUS).cuda()
     
 

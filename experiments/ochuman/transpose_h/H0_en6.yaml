@@ -115,7 +115,7 @@ TEST:
   IMAGE_THRE: 0.0
   IN_VIS_THRE: 0.2
   # MODEL_FILE: models/pytorch/transpose_ochuman/H0_en6_transpose_ochuman.pth
-  MODEL_FILE: output/OCHuman/transpose_h/H0_en6/model_best.pth
+  MODEL_FILE: /media/ming-t/F83438063437C702/project/InterFormer/models/pytorch/interformer_ochuman/single/transposeH_ochuman_en6.pth
   # MODEL_FILE: output/crowdpose/transpose_h/H0_en6/model_best.pth
   NMS_THRE: 1.0
   OKS_THRE: 0.9
