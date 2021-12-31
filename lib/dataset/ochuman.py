@@ -23,6 +23,7 @@ import random
 from dataset.JointsDataset import JointsDataset
 from nms.nms import oks_nms
 from nms.nms import soft_oks_nms
+from utils.KeypointEvaluator import KeypointEvaluator
 
 
 logger = logging.getLogger(__name__)
@@ -67,7 +68,7 @@ class OCHumanDataset(JointsDataset):
         self.aspect_ratio = self.image_width * 1.0 / self.image_height
         self.pixel_std = 200
 
-        self.coco = COCO(os.path.join(self.root,self.image_set))
+        self.coco = COCO(self._get_ann_file_keypoint())
 
         # deal with class names
         cats = [cat['name']
@@ -113,14 +114,15 @@ class OCHumanDataset(JointsDataset):
 
     def _get_ann_file_keypoint(self):
         """ self.root / annotations / person_keypoints_train2017.json """
-        prefix = 'person_keypoints' \
-            if 'test' not in self.image_set else 'image_info'
-        return os.path.join(
-            self.root,
-            'annotations',
-            prefix + '_' + self.image_set + '.json'
-        )
-
+        # prefix = 'person_keypoints' \
+        #     if 'test' not in self.image_set else 'image_info'
+        # return os.path.join(
+        #     self.root,
+        #     'annotations',
+        #     prefix + '_' + self.image_set + '.json'
+        # )
+        return os.path.join(self.root,self.image_set)
+    
     def _load_image_set_index(self):
         """ image id: int """
         image_ids = self.coco.getImgIds()
@@ -448,6 +450,13 @@ class OCHumanDataset(JointsDataset):
         return cat_results
 
     def _do_python_keypoint_eval(self, res_file, res_folder):
+        # keval = KeypointEvaluator()
+        # keval.eval('OCHuman', 
+        #         os.path.join(self.root, 'index_ochuman_test.pkl'),
+        #         self._get_ann_file_keypoint(), 
+        #         res_file,
+        #         cluster_mode=[1,2])
+        
         coco_dt = self.coco.loadRes(res_file)
         coco_eval = COCOeval(self.coco, coco_dt, 'keypoints')
         coco_eval.params.useSegm = None

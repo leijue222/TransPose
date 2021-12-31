@@ -25,6 +25,7 @@ import random
 from dataset.JointsDataset import JointsDataset
 from nms.nms import oks_nms
 from nms.nms import soft_oks_nms
+from utils.KeypointEvaluator import KeypointEvaluator
 
 
 logger = logging.getLogger(__name__)
@@ -441,6 +442,13 @@ class CROWDPOSEDataset(JointsDataset):
         return cat_results
 
     def _do_python_keypoint_eval(self, res_file, res_folder):
+        # keval = KeypointEvaluator()
+
+        # keval.eval('crowdpose', 
+        #     os.path.join(self.root, 'index_crowdpose_test.pkl'),
+        #     self._get_ann_file_keypoint(), 
+        #     res_file)
+        
         cocoGt = self.coco
         cocoDt = cocoGt.loadRes(res_file)
         cocoEval = COCOeval(cocoGt, cocoDt, 'keypoints')

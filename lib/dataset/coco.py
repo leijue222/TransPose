@@ -22,6 +22,7 @@ import numpy as np
 from dataset.JointsDataset import JointsDataset
 from nms.nms import oks_nms
 from nms.nms import soft_oks_nms
+from utils.KeypointEvaluator import KeypointEvaluator
 
 
 logger = logging.getLogger(__name__)
@@ -438,6 +439,13 @@ class COCODataset(JointsDataset):
         return cat_results
 
     def _do_python_keypoint_eval(self, res_file, res_folder):
+        # keval = KeypointEvaluator()
+
+        # keval.eval('coco', 
+        #     os.path.join(self.root, 'index_coco_val.pkl'),
+        #     self._get_ann_file_keypoint(), 
+        #     res_file)
+        
         coco_dt = self.coco.loadRes(res_file)
         coco_eval = COCOeval(self.coco, coco_dt, 'keypoints')
         coco_eval.params.useSegm = None
