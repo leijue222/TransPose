@@ -1,18 +1,37 @@
-# 复现TransPose方法在不同分辨率下的结果
+# # 复现TransPose方法在不同分辨率下的结果
 
-# python -m torch.distributed.launch --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_enc6.yaml
-# python -m torch.distributed.launch --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H2_enc6.yaml
+# # python -m torch.distributed.launch --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_enc6.yaml
+# # python -m torch.distributed.launch --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H2_enc6.yaml
 
-torchrun --nproc_per_node=2 tools/ddp_train.py --cfg experiments/ochuman/hrformer/ochuman_288.yaml
-# torchrun --nproc_per_node=2 tools/ddp_train.py --cfg experiments/crowdpose/transpose_h/H0_en6.yaml
+# torchrun --nproc_per_node=2 tools/ddp_train.py --cfg experiments/ochuman/hrformer/ochuman_288.yaml
+# # torchrun --nproc_per_node=2 tools/ddp_train.py --cfg experiments/crowdpose/transpose_h/H0_en6.yaml
  
-# 用TransPose在CoCoMini数据集上训练encorder不同层数的情况
-# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en6_cocomini.yaml
-# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en3_cocomini.yaml
-# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en4_cocomini.yaml
-# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en4_head8_cocomini.yaml
+# # 用TransPose在CoCoMini数据集上训练encorder不同层数的情况
+# # torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en6_cocomini.yaml
+# # torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en3_cocomini.yaml
+# # torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en4_cocomini.yaml
+# # torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/coco/transpose_h/H0_en4_head8_cocomini.yaml
 
-# 用TransPose在CrowdPose数据集上训练encorder层数为3和4的情况
+# # 用TransPose在CrowdPose数据集上训练encorder层数为3和4的情况
 
-torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/transpose_h/H0_en3.yaml
-torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/transpose_h/H0_en4.yaml
+# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/transpose_h/H0_en3.yaml
+# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/transpose_h/H0_en4.yaml
+
+
+# [2022.1.1]
+# 需要的环境 python 3.8 torch 1.10
+# 1. 安装依赖
+pip install -r requiremrnt.txt
+# 2. 安装 nms
+cd lib
+make
+cd ..
+# 3. 安装 crowdpose
+git clone https://github.com/Jeff-sjtu/CrowdPose.git
+cd CrowdPose/crowdpose-api/PythonAPI/
+sh install.sh
+cd ../../../
+rm -rf CrowdPose
+
+# 4. hrformer 在 crowdpose 上训练
+torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/hrformer/crowdpose_192.yaml

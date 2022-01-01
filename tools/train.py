@@ -115,8 +115,8 @@ def main():
     }
 
     model = torch.nn.DataParallel(model, device_ids=cfg.GPUS).cuda()
-    
 
+    
     # define loss function (criterion) and optimizer
     criterion = JointsMSELoss(
         use_target_weight=cfg.LOSS.USE_TARGET_WEIGHT

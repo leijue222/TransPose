@@ -8,24 +8,25 @@ GPUS: (0,)
 OUTPUT_DIR: 'output'
 LOG_DIR: 'log'
 WORKERS: 8
-PRINT_FREQ: 100
+PRINT_FREQ: 50
 
 DATASET:
   COLOR_RGB: true
-  DATASET: 'crowdpose'
+  DATASET: 'OCHuman'
   DATA_FORMAT: jpg
   FLIP: true
-  NUM_JOINTS_HALF_BODY: 6
+  NUM_JOINTS_HALF_BODY: 8
   PROB_HALF_BODY: 0.3 
-  # ROOT: '/media/ming-t/F83438063437C702/datasets/crowdpose/'
-  ROOT: '../MutiTransPose/data/crowdpose'
+  ROOT: '/media/ming-t/F83438063437C702/datasets/OCHuman/'
+  # ROOT: '../MutiTransPose/data/coco'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
-  TEST_SET: 'test'
-  TRAIN_SET: 'trainval'
+  TEST_SET: 'ochuman_coco_format_test_range_0.00_1.00.json'
+  TRAIN_SET: 'ochuman_coco_format_val_range_0.00_1.00.json'
 MODEL:
   # Transformer Encoder
-  DIM_MODEL: 96
+  HRNET_RES_LAYER: 0
+  DIM_MODEL: 78
   DIM_FEEDFORWARD: 192
   N_HEAD: 1
   ENCODER_LAYERS: 6
@@ -34,32 +35,30 @@ MODEL:
   # #
   INIT_WEIGHTS: true
   NAME: hrformer
-  NUM_JOINTS: 14
-  # PRETRAINED: '../MutiTransPose/models/pytorch/imagenet/hrnet_w48-8ef0771d.pth'
-  # PRETRAINED: '../InterFormer/models/pytorch/imagenet/hrnet_w48-8ef0771d.pth'
+  NUM_JOINTS: 17
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
-  - 192
-  - 256
+  - 288
+  - 384
   HEATMAP_SIZE:
-  - 48
-  - 64
+  - 72
+  - 96
   SIGMA: 2
   EXTRA:
     DECONV_WITH_BIAS: false
     NUM_DECONV_LAYERS: 1
     NUM_DECONV_FILTERS:
-    - 96
+    - 78
     NUM_DECONV_KERNELS:
     - 4
-    FINAL_CONV_KERNEL: 1  
+    FINAL_CONV_KERNEL: 1
 LOSS:
   USE_TARGET_WEIGHT: true
 TRAIN:
-  BATCH_SIZE_PER_GPU: 20
+  BATCH_SIZE_PER_GPU: 6
   SHUFFLE: true
   BEGIN_EPOCH: 0
-  END_EPOCH: 240
+  END_EPOCH: 300
   LR: 0.0001  # Initial learning rate
   LR_END: 0.00001  # Final learning rate
   LR_FACTOR: 0.25  # for MultiStepLR
@@ -76,11 +75,10 @@ TRAIN:
 TEST:
   BLUR_KERNEL: 11
   BATCH_SIZE_PER_GPU: 128
+  MODEL_FILE: output/OCHuman/hrformer/ochuman_288/model_best.pth
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0
   IN_VIS_THRE: 0.2
-  MODEL_FILE: models/pytorch/transpose_crowdpose/crowdpose_h0_en6.pth
-  # MODEL_FILE: output/crowdpose/transpose_h/H0_en6/model_best.pth
   NMS_THRE: 1.0
   OKS_THRE: 0.9
   USE_GT_BBOX: true
