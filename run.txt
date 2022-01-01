@@ -35,3 +35,4 @@ rm -rf CrowdPose
 
 # 4. hrformer 在 crowdpose 上训练
 torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/hrformer/crowdpose_192.yaml
+torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/hrformer/crowdpose_288.yaml
