@@ -134,7 +134,7 @@ def main():
     random.seed(seed)
 
     model = eval('models.'+cfg.MODEL.NAME+'.get_pose_net')(
-        cfg, is_train=True
+        cfg, is_train=True, pretrained_model=cfg.MODEL.PRETRAINED
     )
 
     model = model.cuda()
