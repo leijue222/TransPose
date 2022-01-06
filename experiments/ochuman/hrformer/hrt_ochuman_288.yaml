@@ -17,8 +17,8 @@ DATASET:
   FLIP: true
   NUM_JOINTS_HALF_BODY: 8
   PROB_HALF_BODY: 0.3 
-  ROOT: '/media/ming-t/F83438063437C702/datasets/OCHuman/'
-  # ROOT: '../MutiTransPose/data/OCHuman'
+  # ROOT: '/media/ming-t/F83438063437C702/datasets/OCHuman/'
+  ROOT: '../MutiTransPose/data/OCHuman'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: 'ochuman_coco_format_test_range_0.00_1.00.json'
