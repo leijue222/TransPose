@@ -2526,8 +2526,8 @@ def get_pose_net(cfg, is_train, pretrained_model):
             num_window_sizes=[7, 7, 7, 7]))
     
     hrformer=HRFormer(extra,78,cfg.MODEL.NUM_JOINTS,0)
-    if is_train:
-        load_checkpoint(hrformer, pretrained_model)
+    # if is_train:
+        # load_checkpoint(hrformer, pretrained_model)
     
     return hrformer
 
