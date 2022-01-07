@@ -2485,7 +2485,7 @@ class HRFormer(nn.Module):
 # print(out.shape)
 
 # def get_pose_net(cfg, model_path, e2e_flag):
-def get_pose_net(cfg, is_train, pretrained_model):
+def get_pose_net(cfg, is_train):
     
     extra=dict(
         drop_path_rate=0.2,
