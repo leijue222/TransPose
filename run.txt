@@ -1,9 +1,21 @@
-1. 下载base model -> https://github.com/HRNet/HRFormer/releases/download/v1.0.0/hrt_base_imagenet_pretrained_top1_828.pth
-放在 InterFormer/models/pytorch/hrformer/ 目录下
+torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/hrformer/crowdpose_192.yaml
+torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/ochuman/hrformer/ochuman_192.yaml
 
-2. 训练HRFormer在OCHuman下的模型
-torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/ochuman/hrformer/hrt_ochuman_192.yaml
-torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/ochuman/hrformer/hrt_ochuman_288.yaml
+
+
+
+
+
+
+
+
+
+# 1. 下载base model -> https://github.com/HRNet/HRFormer/releases/download/v1.0.0/hrt_base_imagenet_pretrained_top1_828.pth
+# 放在 InterFormer/models/pytorch/hrformer/ 目录下
+
+# 2. 训练HRFormer在OCHuman下的模型
+# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/ochuman/hrformer/hrt_ochuman_192.yaml
+# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/ochuman/hrformer/hrt_ochuman_288.yaml
 
 # # 复现TransPose方法在不同分辨率下的结果
 
