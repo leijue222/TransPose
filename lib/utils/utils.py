@@ -93,7 +93,14 @@ def get_optimizer(cfg, model):
             model.parameters(),
             lr=cfg.TRAIN.LR
         )
-
+    elif cfg.TRAIN.OPTIMIZER =='adamw':
+        optimizer = optim.AdamW(
+            model.parameters(),
+            lr=5e-4,
+            betas=(0.9, 0.999),
+            weight_decay=0.01,
+        )
+        print("==> OPTIMIZER is AdamW")
     return optimizer
 
 
