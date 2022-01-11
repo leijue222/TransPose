@@ -1,14 +1,9 @@
-torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/hrformer/crowdpose_192.yaml
-torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/ochuman/hrformer/ochuman_192.yaml
+
+torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/hrformer/hrt_imagenet_base_crowdpose_192.yaml
 
 
-
-
-
-
-
-
-
+# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/hrformer/crowdpose_192.yaml
+# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/ochuman/hrformer/ochuman_192.yaml
 
 # 1. 下载base model -> https://github.com/HRNet/HRFormer/releases/download/v1.0.0/hrt_base_imagenet_pretrained_top1_828.pth
 # 放在 InterFormer/models/pytorch/hrformer/ 目录下
