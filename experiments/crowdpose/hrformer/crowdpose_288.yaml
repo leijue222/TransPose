@@ -17,8 +17,8 @@ DATASET:
   FLIP: true
   NUM_JOINTS_HALF_BODY: 6
   PROB_HALF_BODY: 0.3 
-  # ROOT: '/media/ming-t/F83438063437C702/datasets/crowdpose/'
-  ROOT: '../MutiTransPose/data/crowdpose'
+  ROOT: '/media/ming-t/F83438063437C702/datasets/crowdpose/'
+  # ROOT: '../MutiTransPose/data/crowdpose'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: 'test'
@@ -79,8 +79,7 @@ TEST:
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0
   IN_VIS_THRE: 0.2
-  MODEL_FILE: models/pytorch/transpose_crowdpose/crowdpose_h0_en6.pth
-  # MODEL_FILE: output/crowdpose/transpose_h/H0_en6/model_best.pth
+  MODEL_FILE: models/pytorch/hrformer/hrt_base_crowdpose_384x288.pth
   NMS_THRE: 1.0
   OKS_THRE: 0.9
   USE_GT_BBOX: true
