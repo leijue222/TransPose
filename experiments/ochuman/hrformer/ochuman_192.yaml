@@ -17,8 +17,8 @@ DATASET:
   FLIP: true
   NUM_JOINTS_HALF_BODY: 8
   PROB_HALF_BODY: 0.3 
-  # ROOT: '/media/ming-t/F83438063437C702/datasets/OCHuman/'
-  ROOT: '../MutiTransPose/data/OCHuman'
+  ROOT: '/media/ming-t/F83438063437C702/datasets/OCHuman/'
+  # ROOT: '../MutiTransPose/data/OCHuman'
   ROT_FACTOR: 45
   SCALE_FACTOR: 0.35
   TEST_SET: 'ochuman_coco_format_test_range_0.00_1.00.json'
@@ -34,6 +34,7 @@ MODEL:
   # #
   INIT_WEIGHTS: true
   NAME: hrformer
+  PRETRAINED: '../InterFormer/models/pytorch/hrformer/hrt_base_imagenet_pretrained_top1_828.pth'
   NUM_JOINTS: 17
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
@@ -79,6 +80,8 @@ TEST:
   IN_VIS_THRE: 0.2
   NMS_THRE: 1.0
   OKS_THRE: 0.9
+  MODEL_FILE: models/pytorch/hrformer/hrt_base_ochuman_256x192.pth
+  # MODEL_FILE: models/pytorch/hrformer/hrt_base_ochuman_192_mmpose.pth
   USE_GT_BBOX: true
   FLIP_TEST: true
   POST_PROCESS: true

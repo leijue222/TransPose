@@ -35,6 +35,7 @@ MODEL:
   # #
   INIT_WEIGHTS: true
   NAME: hrformer
+  PRETRAINED: '../InterFormer/models/pytorch/hrformer/hrt_base_imagenet_pretrained_top1_828.pth'
   NUM_JOINTS: 17
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
@@ -75,7 +76,7 @@ TRAIN:
 TEST:
   BLUR_KERNEL: 11
   BATCH_SIZE_PER_GPU: 128
-  MODEL_FILE: output/OCHuman/hrformer/ochuman_288/model_best.pth
+  MODEL_FILE: models/pytorch/hrformer/hrt_base_ochuman_384x288.pth
   BBOX_THRE: 1.0
   IMAGE_THRE: 0.0
   IN_VIS_THRE: 0.2

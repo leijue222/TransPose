@@ -80,23 +80,28 @@ def main():
     cudnn.benchmark = cfg.CUDNN.BENCHMARK
     torch.backends.cudnn.deterministic = cfg.CUDNN.DETERMINISTIC
     torch.backends.cudnn.enabled = cfg.CUDNN.ENABLED
-
+    
     model = eval('models.'+cfg.MODEL.NAME+'.get_pose_net')(
         cfg, is_train=False
     )
 
-    if cfg.TEST.MODEL_FILE:
-        logger.info('=> loading model from {}'.format(cfg.TEST.MODEL_FILE))
-        ckpt_state_dict = torch.load(cfg.TEST.MODEL_FILE)
-        # print(ckpt_state_dict['pos_embedding'])  # FOR UNSeen Resolutions
-        # ckpt_state_dict.pop('pos_embedding') # FOR UNSeen Resolutions
-        model.load_state_dict(ckpt_state_dict, strict=False)   #  strict=False FOR UNSeen Resolutions
+    if cfg.MODEL.NAME != 'hrformer':
+        if cfg.TEST.MODEL_FILE:
+            logger.info('=> loading model from {}'.format(cfg.TEST.MODEL_FILE))
+            ckpt_state_dict = torch.load(cfg.TEST.MODEL_FILE)
+            # print(ckpt_state_dict['pos_embedding'])  # FOR UNSeen Resolutions
+            # ckpt_state_dict.pop('pos_embedding') # FOR UNSeen Resolutions
+            model.load_state_dict(ckpt_state_dict, strict=False)   #  strict=False FOR UNSeen Resolutions
+        else:
+            model_state_file = os.path.join(
+                final_output_dir, 'final_state.pth'
+            )
+            logger.info('=> loading model from {}'.format(model_state_file))
+            model.load_state_dict(torch.load(model_state_file))
     else:
-        model_state_file = os.path.join(
-            final_output_dir, 'final_state.pth'
-        )
-        logger.info('=> loading model from {}'.format(model_state_file))
-        model.load_state_dict(torch.load(model_state_file))
+        from models.hrformer import load_hrformer_checkpoint
+        load_hrformer_checkpoint(model, cfg.TEST.MODEL_FILE)
+        logger.info('=> loading model from {}'.format(cfg.TEST.MODEL_FILE))
     w, h = cfg.MODEL.IMAGE_SIZE
 
     ######### FOR UNSeen Resolutions  #########

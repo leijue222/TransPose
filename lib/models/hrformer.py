@@ -12,7 +12,7 @@ from mmcv.cnn import (
     normal_init,
     build_upsample_layer,
 )
-from mmcv.runner import load_checkpoint
+# from mmcv.runner import load_checkpoint
 from mmcv.runner.checkpoint import load_state_dict
 from mmcv.utils.parrots_wrapper import _BatchNorm
 
@@ -21,6 +21,7 @@ import logging
 
 from mmcv.utils import get_logger
 
+logger = logging.getLogger(__name__)
 
 def get_root_logger(log_file=None, log_level=logging.INFO):
     """Use `get_logger` method in mmcv to get the root logger.
@@ -150,7 +151,7 @@ def load_state_dict(module, state_dict, strict=False, logger=None):
         else:
             print(err_msg)
 
-def load_checkpoint(model,
+def load_hrformer_checkpoint(model,
                     filename,
                     map_location=None,
                     strict=False,
@@ -1496,7 +1497,7 @@ class HighResolutionTransformerModule(nn.Module):
         self.num_mlp_ratios = num_mlp_ratios
 
     def _check_branches(self, num_branches, num_blocks, in_channels, num_channels):
-        logger = get_root_logger()
+        # logger = get_root_logger()
         if num_branches != len(num_blocks):
             error_msg = "NUM_BRANCHES({}) <> NUM_BLOCKS({})".format(
                 num_branches, len(num_blocks)
@@ -1794,7 +1795,7 @@ class HRT(nn.Module):
         drop_path_rate = self.extra["drop_path_rate"]
         dpr = [x.item() for x in torch.linspace(0, drop_path_rate, sum(depths))]
 
-        logger = get_root_logger()
+        # logger = get_root_logger()
         logger.info(dpr)
 
         # stage 1
@@ -2031,8 +2032,8 @@ class HRT(nn.Module):
             Defaults to None.
         """
         if isinstance(pretrained, str):
-            logger = get_root_logger()
-            ckpt = load_checkpoint(self, pretrained, strict=False)
+            # logger = get_root_logger()
+            ckpt = load_hrformer_checkpoint(self, pretrained, strict=False)
             if "model" in ckpt:
                 msg = self.load_state_dict(ckpt["model"], strict=False)
                 logger.info(msg)
@@ -2476,16 +2477,15 @@ class HRFormer(nn.Module):
     def forward(self, x):
         x_tmp=self.backbone(x)
         x_out=self.keypoint_head(x_tmp)
-        return x_out
         # return x_tmp[0], x_out
+        return x_out
 # hrformer=HRFormer(extra,78,17,0)
 # load_checkpoint(hrformer, './hrt_base_coco_256x192.pth', map_location='cpu')
 # img = torch.ones(1,3,256,192)
 # out = hrformer(img)
 # print(out.shape)
 
-# def get_pose_net(cfg, model_path, e2e_flag):
-def get_pose_net(cfg, is_train, pretrained_model):
+def get_pose_net(cfg, is_train):
     
     extra=dict(
         drop_path_rate=0.2,
@@ -2527,8 +2527,9 @@ def get_pose_net(cfg, is_train, pretrained_model):
     
     hrformer=HRFormer(extra,78,cfg.MODEL.NUM_JOINTS,0)
     if is_train:
-        load_checkpoint(hrformer, pretrained_model)
-        print(' ==> loading ' + pretrained_model)
+        load_hrformer_checkpoint(hrformer, cfg.MODEL.PRETRAINED)
+        logger.info('=> loading hrformer pretrained model {}'.format(cfg.MODEL.PRETRAINED))
+        
     return hrformer
 
 
