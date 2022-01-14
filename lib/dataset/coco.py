@@ -440,11 +440,11 @@ class COCODataset(JointsDataset):
 
     def _do_python_keypoint_eval(self, res_file, res_folder):
         # keval = KeypointEvaluator()
-
         # keval.eval('coco', 
         #     os.path.join(self.root, 'index_coco_val.pkl'),
         #     self._get_ann_file_keypoint(), 
-        #     res_file)
+        #     res_file,
+        #     cluster_mode=[1,2])
         
         coco_dt = self.coco.loadRes(res_file)
         coco_eval = COCOeval(self.coco, coco_dt, 'keypoints')
