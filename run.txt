@@ -1,6 +1,7 @@
+torchrun --nproc_per_node=2 tools/ddp_train.py --cfg experiments/crowdpose/hrformer/hrt_base_crowdpose_192.yaml
 
-torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/hrformer/hrt_imagenet_base_crowdpose_192.yaml
 
+# torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/hrformer/hrt_imagenet_base_crowdpose_192.yaml
 
 # torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/crowdpose/hrformer/crowdpose_192.yaml
 # torchrun --nproc_per_node=8 tools/ddp_train.py --cfg experiments/ochuman/hrformer/ochuman_192.yaml
